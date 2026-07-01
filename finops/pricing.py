@@ -52,6 +52,33 @@ def discount_stack(
     return cache_mult * batch_mult
 
 
+def cache_break_even_reads(
+    write_cost_per_m: float,
+    read_price_per_m: float = 1.0,
+    read_discount: float = 0.10,
+) -> float:
+    """Cached-prefix reads needed before prompt caching pays for its write cost.
+
+    `write_cost_per_m` and `read_price_per_m` are USD per 1M input tokens. A cached
+    read saves `(1 - read_discount) * read_price_per_m`, so the break-even read
+    count is write cost divided by savings per read.
+    """
+    saved_per_read = max(0.0, read_price_per_m) * max(0.0, 1.0 - read_discount)
+    if saved_per_read <= 0:
+        return float("inf")
+    return max(0.0, write_cost_per_m) / saved_per_read
+
+
+def cache_is_worth_it(
+    avg_cache_reads: float,
+    write_cost_per_m: float,
+    read_discount: float = 0.10,
+    read_price_per_m: float = 1.0,
+) -> bool:
+    """Return True when expected cached reads exceed the cache write break-even."""
+    return avg_cache_reads >= cache_break_even_reads(write_cost_per_m, read_price_per_m, read_discount)
+
+
 def break_even_utilization(discount_frac: float) -> float:
     """Utilization at which a commitment pays off ~= 1 - discount.
 

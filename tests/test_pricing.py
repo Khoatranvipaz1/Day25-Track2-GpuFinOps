@@ -9,6 +9,13 @@ def test_discount_stack_is_multiplicative():
     assert abs(pricing.discount_stack(batch=True) - 0.5) < 1e-9
 
 
+def test_cache_break_even_and_policy():
+    be = pricing.cache_break_even_reads(write_cost_per_m=0.09, read_price_per_m=1.0)
+    assert abs(be - 0.1) < 1e-9
+    assert pricing.cache_is_worth_it(0.11, write_cost_per_m=0.09, read_price_per_m=1.0)
+    assert not pricing.cache_is_worth_it(0.09, write_cost_per_m=0.09, read_price_per_m=1.0)
+
+
 def test_break_even():
     assert abs(pricing.break_even_utilization(0.45) - 0.55) < 1e-9
     assert pricing.break_even_utilization(0.0) == 1.0

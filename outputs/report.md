@@ -1,4 +1,4 @@
-# NimbusAI — GPU Cost Optimization Report
+# NimbusAI â€” GPU Cost Optimization Report
 
 **Period:** monthly  
 **Baseline spend:** $27,133  
